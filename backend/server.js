@@ -1,38 +1,29 @@
 const express = require("express");
-const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const cors = require("cors");
+const authRoutes = require("../backend/routes/authRoute");
+const mlRoutes = require("./routes/mlRoutes");
 
-// Load environment variables
 dotenv.config();
-
-// Initialize Express app
 const app = express();
 
-// Middleware
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// MongoDB connection
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("MongoDB connected...");
-  } catch (error) {
-    console.error("MongoDB connection error:", error.message);
-    process.exit(1);
-  }
-};
-connectDB();
+// Database Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// Basic route for testing
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
 
-// Start the server
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/ml", mlRoutes);
+
+// Skill Routes
+const skillRoutes = require("./routes/skillRoutes");
+app.use("/api/skills", skillRoutes);
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
