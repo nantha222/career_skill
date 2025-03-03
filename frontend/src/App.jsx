@@ -8,6 +8,8 @@ import AdminDashboard from "./pages/AdminPage";
 import AdminRoute from "./components/AdminRoute";
 import Login from "./pages/LoginPage";
 import Register from "./pages/registerPage";
+import AdminSkillMapPage from "./pages/AdminSkillMapPage";
+import SkillDetail from "./pages/SkillDetail";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -44,6 +46,9 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin_map" element={<AdminSkillMapPage />} />
+            <Route path="/skill/:id" element={<SkillDetail />} />
+
             <Route 
               path="/questionnaire" 
               element={

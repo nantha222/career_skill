@@ -56,7 +56,7 @@ const Dashboard = () => {
                                 <FaUserCircle size={20} /> Profile
                             </Link>
                         </li>
-                        <li>
+                        <li> 
                             <button onClick={handleLogout} className="flex items-center gap-1 text-red-500 hover:text-red-600">
                                 <FiLogOut size={20} /> Logout
                             </button>
