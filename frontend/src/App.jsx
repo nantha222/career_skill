@@ -13,13 +13,21 @@ import SkillDetail from "./pages/SkillDetail";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [visitedQuestionnaire, setVisitedQuestionnaire] = useState(false);
+  const [visitedQuestionnaire, setVisitedQuestionnaire] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
+    const visited = localStorage.getItem("visitedQuestionnaire") === "true";
+
     setUser(storedUser);
-    setVisitedQuestionnaire(localStorage.getItem("visitedQuestionnaire") === "true");
+    setVisitedQuestionnaire(visited);
+    setLoading(false); // Set loading to false once data is fetched
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator while checking localStorage
+  }
 
   return (
     <Router>
@@ -29,7 +37,7 @@ function App() {
           element={
             user
               ? visitedQuestionnaire
-                ? <Navigate to="/questionnaire" />
+                ? <Navigate to="/dashboard" />
                 : <Navigate to="/questionnaire" />
               : <Navigate to="/login" />
           }
@@ -64,7 +72,7 @@ function App() {
           </Route>
         )}
 
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       </Routes>
     </Router>
   );
