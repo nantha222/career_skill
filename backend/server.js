@@ -33,14 +33,10 @@ app.use("/api/ml", mlRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/skill-maps", skillMapRoutes);
 
-// Default Route
-app.get("/api/skill-maps/:id", async (req, res) => {
-  const skill = await Skill.findById(req.params.id);
-  res.json(skill);
-});
+// ✅ Remove the unnecessary duplicate GET /api/skill-maps/:id
 
-// Error Handling Middleware
-app.use((req, res, next) => {
+// Error Handling Middleware (Handles 404 errors)
+app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 

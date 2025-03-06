@@ -1,15 +1,22 @@
 const mongoose = require("mongoose");
 
-const skillMapSchema = new mongoose.Schema({
-  skillName: { type: String, required: true },
-  learningPath: [
-      {
-          topic: { type: String, required: true },
-          order: { type: Number, required: true }
-      }
-  ], // ✅ Now it expects an array of objects
-  courseLinks: [{ type: String }],
-  youtubeLinks: [{ type: String }]
+const subtopicSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  resources: [{ type: String }], // Multiple resource links
 });
 
-module.exports = mongoose.model("SkillMap", skillMapSchema);
+const topicSchema = new mongoose.Schema({
+  topic: { type: String, required: true },
+  subtopics: [subtopicSchema], // Each topic has multiple subtopics
+  order: { type: Number, required: true },
+});
+
+const skillMapSchema = new mongoose.Schema({
+  skillName: { type: String, required: true, unique: true },
+  learningPath: [topicSchema], // Array of topics with subtopics
+  courseLinks: [{ type: String }], // General course links
+  youtubeLinks: [{ type: String }], // General YouTube links
+});
+
+const SkillMap = mongoose.model("SkillMap", skillMapSchema);
+module.exports = SkillMap;

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const QuestionnairePage = () => {
+const QuestionnairePage = ({ onComplete }) => {
     const navigate = useNavigate();
     const [darkMode, setDarkMode] = useState(false);
     const [step, setStep] = useState(1);
@@ -19,6 +19,14 @@ const QuestionnairePage = () => {
 
     const [prediction, setPrediction] = useState("");
     const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        // Check if the questionnaire has been completed
+        const visited = localStorage.getItem("visitedQuestionnaire") === "true";
+        if (visited) {
+            navigate("/dashboard");
+        }
+    }, [navigate]);
 
     const validateForm = () => {
         let newErrors = {};
@@ -45,10 +53,11 @@ const QuestionnairePage = () => {
         if (!validateForm()) return;
 
         try {
-            const response = await axios.post("http://127.0.0.1:5000/predict", formData); // Ensure correct port
+            const response = await axios.post("http://127.0.0.1:5000/predict", formData);
 
             if (response.data.skill) {
-                setPrediction(response.data.skill); // Store prediction
+                setPrediction(response.data.skill);
+                onComplete(); // Mark questionnaire as completed
             } else {
                 console.error("No skill returned from API", response.data);
                 setPrediction("No skill prediction available.");
@@ -84,7 +93,6 @@ const QuestionnairePage = () => {
                 <div className={`${darkMode ? "bg-gray-800" : "bg-white"} p-6 rounded-lg shadow-lg w-full max-w-md`}>
                     <h2 className="text-xl font-semibold text-center mb-4">Skill Prediction</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
-
                         {/* Age */}
                         <div>
                             <label className="block text-sm font-medium">Age</label>

@@ -18,29 +18,26 @@ function App() {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     setUser(storedUser);
-    setVisitedQuestionnaire(localStorage.getItem("visitedQuestionnaire") === "true"); 
+    setVisitedQuestionnaire(localStorage.getItem("visitedQuestionnaire") === "true");
   }, []);
 
   return (
     <Router>
       <Routes>
-        {/* ✅ Default Route - Redirects users based on questionnaire completion */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
-            user 
-              ? visitedQuestionnaire 
-                ? <Navigate to="/dashboard" />  // If they have completed the questionnaire, go to Dashboard
-                : <Navigate to="/questionnaire" /> // If not, go to Questionnaire first
+            user
+              ? visitedQuestionnaire
+                ? <Navigate to="/questionnaire" />
+                : <Navigate to="/questionnaire" />
               : <Navigate to="/login" />
-          } 
+          }
         />
 
-        {/* ✅ Authentication Routes */}
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register />} />
 
-        {/* ✅ Protected User Routes */}
         {user && (
           <>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -49,23 +46,24 @@ function App() {
             <Route path="/admin_map" element={<AdminSkillMapPage />} />
             <Route path="/skill/:id" element={<SkillDetail />} />
 
-            <Route 
-              path="/questionnaire" 
+            <Route
+              path="/questionnaire"
               element={
-                <Questionnaire onComplete={() => localStorage.setItem("visitedQuestionnaire", "true")} />
-              } 
+                <Questionnaire onComplete={() => {
+                  localStorage.setItem("visitedQuestionnaire", "true");
+                  setVisitedQuestionnaire(true);
+                }} />
+              }
             />
           </>
         )}
 
-        {/* ✅ Admin Route (Protected) */}
         {user?.email === "admin@gmail.com" && (
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminDashboard />} />
           </Route>
         )}
 
-        {/* ✅ Redirect unknown routes to login */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
