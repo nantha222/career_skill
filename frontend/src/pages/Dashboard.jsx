@@ -4,11 +4,13 @@ import { FiLogOut } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
 import { MdExplore } from "react-icons/md";
 import { AiOutlineHome } from "react-icons/ai";
+import { GiArtificialIntelligence } from "react-icons/gi";
+import axios from "axios";
 
 const Dashboard = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [skills, setSkills] = useState([]);
+    const [predictedSkill, setPredictedSkill] = useState("");
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -16,17 +18,18 @@ const Dashboard = () => {
             navigate("/login"); // Redirect if no user
         } else {
             setUser(storedUser);
-            fetchRecommendedSkills(); // Fetch recommended skills
+            fetchPredictedSkill(); // Fetch the predicted skill
         }
     }, [navigate]);
 
-    // Simulated skill recommendations
-    const fetchRecommendedSkills = () => {
-        setSkills([
-            { id: 1, name: "Machine Learning", description: "Learn AI models and neural networks.", color: "bg-blue-500" },
-            { id: 2, name: "Full-Stack Development", description: "Master React, Node.js, and databases.", color: "bg-green-500" },
-            { id: 3, name: "Blockchain", description: "Explore Web3, Solidity, and Smart Contracts.", color: "bg-purple-500" },
-        ]);
+    const fetchPredictedSkill = () => {
+        axios.get("http://localhost:5000/api/predicted-skill")
+            .then((response) => {
+                setPredictedSkill(response.data.skill);
+            })
+            .catch((error) => {
+                console.error("Error fetching predicted skill", error);
+            });
     };
 
     const handleLogout = () => {
@@ -47,6 +50,11 @@ const Dashboard = () => {
                             </Link>
                         </li>
                         <li>
+                            <Link to="/questionnaire" className="flex items-center gap-1 hover:text-blue-500">
+                                <GiArtificialIntelligence size={20} /> Predict
+                            </Link>
+                        </li>
+                        <li>
                             <Link to="/explore" className="flex items-center gap-1 hover:text-blue-500">
                                 <MdExplore size={20} /> Explore
                             </Link>
@@ -56,7 +64,7 @@ const Dashboard = () => {
                                 <FaUserCircle size={20} /> Profile
                             </Link>
                         </li>
-                        <li> 
+                        <li>
                             <button onClick={handleLogout} className="flex items-center gap-1 text-red-500 hover:text-red-600">
                                 <FiLogOut size={20} /> Logout
                             </button>
@@ -71,19 +79,19 @@ const Dashboard = () => {
                 {user && (
                     <div className="text-center mb-8">
                         <h2 className="text-2xl font-semibold">Welcome, {user.name}! 👋</h2>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">Here are your recommended skills:</p>
+                        <p className="text-gray-600 dark:text-gray-400 mt-2">Here is your predicted skill:</p>
                     </div>
                 )}
-
-                {/* ✅ Recommended Skills Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {skills.map((skill) => (
-                        <div key={skill.id} className={`p-6 rounded-lg shadow-lg text-white ${skill.color} transform hover:scale-105 transition duration-300`}>
-                            <h3 className="text-lg font-bold">{skill.name}</h3>
-                            <p className="text-sm mt-2">{skill.description}</p>
+ 
+                {/* ✅ Predicted Skill Section */}
+                {predictedSkill && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="p-6 rounded-lg shadow-lg text-white bg-blue-500 transform hover:scale-105 transition duration-300">
+                            <h3 className="text-lg font-bold">Predicted Skill</h3>
+                            <p className="text-sm mt-2">{predictedSkill}</p>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -18,6 +18,7 @@ const QuestionnairePage = ({ onComplete }) => {
     });
 
     const [prediction, setPrediction] = useState("");
+    const [isFinalized, setIsFinalized] = useState(false);
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -52,12 +53,19 @@ const QuestionnairePage = ({ onComplete }) => {
         e.preventDefault();
         if (!validateForm()) return;
 
+        const userId = "user123"; // Replace with actual user ID retrieval logic
+
         try {
             const response = await axios.post("http://127.0.0.1:5000/predict", formData);
 
             if (response.data.skill) {
                 setPrediction(response.data.skill);
-                onComplete(); // Mark questionnaire as completed
+
+                // Save the predicted skill to the database
+                await axios.post("http://localhost:5000/api/save-prediction", { userId, skill: response.data.skill });
+
+                // Mark questionnaire as completed
+                onComplete();
             } else {
                 console.error("No skill returned from API", response.data);
                 setPrediction("No skill prediction available.");
@@ -66,6 +74,11 @@ const QuestionnairePage = ({ onComplete }) => {
             console.error("Prediction failed:", error);
             setPrediction("Error: Could not get a prediction.");
         }
+    };
+
+    const handleFinalize = () => {
+        setIsFinalized(true);
+        navigate("/dashboard");
     };
 
     return (
@@ -193,9 +206,15 @@ const QuestionnairePage = ({ onComplete }) => {
                             </div>
                         )}
 
-                        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-                            Predict Skill
-                        </button>
+                        {prediction && !isFinalized ? (
+                            <button onClick={handleFinalize} className="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 mt-4">
+                                Finalize
+                            </button>
+                        ) : (
+                            <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                                Predict Skill
+                            </button>
+                        )}
                     </form>
                 </div>
             )}

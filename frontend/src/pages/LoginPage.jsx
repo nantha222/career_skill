@@ -16,17 +16,18 @@ const Login = ({ setUser }) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", formData);
-      const userData = res.data.user || null;
+      
+      const userData = res.data; // Store the full response
       localStorage.setItem("user", JSON.stringify(userData));
-
+  
       // Reset visitedQuestionnaire state to false upon login
       localStorage.setItem("visitedQuestionnaire", "false");
-
+  
       if (setUser) setUser(userData);
-
+  
       // Redirect based on user role
       navigate(userData?.email === "admin@gmail.com" ? "/admin" : "/");
     } catch (err) {
@@ -35,6 +36,7 @@ const Login = ({ setUser }) => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
