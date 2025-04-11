@@ -39,7 +39,7 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-            {/* ✅ Navbar */}
+            {/* Navbar */}
             <nav className="bg-white dark:bg-gray-800 shadow-md fixed w-full top-0 z-50">
                 <div className="container mx-auto px-6 py-4 flex justify-between items-center">
                     <h1 className="text-xl font-semibold">Career Skill Map</h1>
@@ -73,17 +73,17 @@ const Dashboard = () => {
                 </div>
             </nav>
 
-            {/* ✅ Main Content */}
+            {/* Main Content */}
             <div className="container mx-auto px-6 pt-24">
-                {/* ✅ Welcome Section */}
+                {/* Welcome Section */}
                 {user && (
                     <div className="text-center mb-8">
                         <h2 className="text-2xl font-semibold">Welcome, {user.name}! 👋</h2>
                         <p className="text-gray-600 dark:text-gray-400 mt-2">Here is your predicted skill:</p>
                     </div>
                 )}
- 
-                {/* ✅ Predicted Skill Section */}
+
+                {/* Predicted Skill Section */}
                 {predictedSkill && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div className="p-6 rounded-lg shadow-lg text-white bg-blue-500 transform hover:scale-105 transition duration-300">

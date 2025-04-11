@@ -53,25 +53,22 @@ app.post("/api/save-prediction", async (req, res) => {
   }
 });
 
-// Route to fetch predicted skills
-router.get("/predicted-skill/:userId", async (req, res) => {
+// Endpoint to fetch the predicted skill
+app.get("/api/predicted-skill", async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+
   try {
-      const { userId } = req.params;
-
-      if (!userId) {
-          return res.status(400).json({ message: "User ID is required" });
-      }
-
-      const skills = await PredictedSkill.findOne({ userId });
-
-      if (!skills) {
-          return res.status(404).json({ message: "No predicted skills found" });
-      }
-
-      res.json(skills);
+    const prediction = await PredictedSkill.findOne({ userId });
+    if (prediction) {
+      res.status(200).json({ skill: prediction.skill });
+    } else {
+      res.status(404).json({ error: "No predicted skill found" });
+    }
   } catch (error) {
-      console.error("Error fetching predicted skills:", error);
-      res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: "Failed to fetch prediction" });
   }
 });
 
