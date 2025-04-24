@@ -17,11 +17,10 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const visited = localStorage.getItem("visitedQuestionnaire") === "true";
+    const storedUser = JSON.parse(localStorage.getItem("user"));;
 
     setUser(storedUser);
-    setVisitedQuestionnaire(visited);
+
     setLoading(false); // Set loading to false once data is fetched
   }, []);
 
@@ -35,15 +34,11 @@ function App() {
         <Route
           path="/"
           element={
-            user
-              ? visitedQuestionnaire
-                ? <Navigate to="/dashboard" />
-                : <Navigate to="/questionnaire" />
-              : <Navigate to="/login" />
+            <Navigate to={user ? "/dashboard" : "/login"} />
           }
         />
 
-        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         {user && (
@@ -56,13 +51,7 @@ function App() {
 
             <Route
               path="/questionnaire"
-              element={
-                <Questionnaire onComplete={() => {
-                  localStorage.setItem("visitedQuestionnaire", "true");
-                  setVisitedQuestionnaire(true);
-                }} />
-              }
-            />
+              element={ <Questionnaire/> } />
           </>
         )}
 

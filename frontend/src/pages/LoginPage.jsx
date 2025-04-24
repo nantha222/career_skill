@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
-const Login = ({ setUser }) => {
+const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,13 +21,10 @@ const Login = ({ setUser }) => {
       const res = await axios.post("http://localhost:5000/api/auth/login", formData);
       
       const userData = res.data; // Store the full response
-      localStorage.setItem("user", JSON.stringify(userData));
-  
-      // Reset visitedQuestionnaire state to false upon login
-      localStorage.setItem("visitedQuestionnaire", "false");
-  
-      if (setUser) setUser(userData);
-  
+      localStorage.setItem("user", JSON.stringify(userData));  
+      const user = JSON.parse(localStorage.getItem("user"));
+      console.log("User data:", user); // Log the user data to check its structure
+      navigate("/dashboard"); // Redirect to home page after successful login
       // Redirect based on user role
       navigate(userData?.email === "admin@gmail.com" ? "/admin" : "/");
     } catch (err) {

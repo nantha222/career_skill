@@ -21,13 +21,6 @@ const QuestionnairePage = ({ onComplete }) => {
     const [isFinalized, setIsFinalized] = useState(false);
     const [errors, setErrors] = useState({});
 
-    useEffect(() => {
-        // Check if the questionnaire has been completed
-        const visited = localStorage.getItem("visitedQuestionnaire") === "true";
-        if (visited) {
-            navigate("/dashboard");
-        }
-    }, [navigate]);
 
     const validateForm = () => {
         let newErrors = {};
@@ -53,8 +46,10 @@ const QuestionnairePage = ({ onComplete }) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        const userId = "user123"; // Replace with actual user ID retrieval logic
-
+        const user = JSON.parse(localStorage.getItem("user"));
+        console.log(user)
+        const userId = user ? user.userId    : null; // Get the user ID from local storage
+     
         try {
             const response = await axios.post("http://127.0.0.1:5000/predict", formData);
 
@@ -63,9 +58,6 @@ const QuestionnairePage = ({ onComplete }) => {
 
                 // Save the predicted skill to the database
                 await axios.post("http://localhost:5000/api/save-prediction", { userId, skill: response.data.skill });
-
-                // Mark questionnaire as completed
-                onComplete();
             } else {
                 console.error("No skill returned from API", response.data);
                 setPrediction("No skill prediction available.");

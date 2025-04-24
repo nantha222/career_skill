@@ -49,26 +49,30 @@ app.post("/api/save-prediction", async (req, res) => {
     );
     res.status(200).json({ message: "Prediction saved successfully" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to save prediction" });
   }
 });
 
+
 // Endpoint to fetch the predicted skill
 app.get("/api/predicted-skill", async (req, res) => {
-  const userId = req.query.userId;
+  const { userId } = req.query;
+
   if (!userId) {
     return res.status(400).json({ error: "User ID is required" });
   }
 
   try {
-    const prediction = await PredictedSkill.findOne({ userId });
+    const prediction = await PredictedSkill.findOne({ userId }).populate("userId");
     if (prediction) {
       res.status(200).json({ skill: prediction.skill });
     } else {
-      res.status(404).json({ error: "No predicted skill found" });
+      res.status(404).json({ error: "No predicted skill found for this user" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch prediction" });
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch predicted skill" });
   }
 });
 
