@@ -20,13 +20,17 @@ const Login = () => {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", formData);
       
-      const userData = res.data; // Store the full response
-      localStorage.setItem("user", JSON.stringify(userData));  
+      const userData = res.data;
+      localStorage.setItem("user", JSON.stringify(userData));
       const user = JSON.parse(localStorage.getItem("user"));
-      console.log("User data:", user); // Log the user data to check its structure
-      navigate("/dashboard"); // Redirect to home page after successful login
-      // Redirect based on user role
-      navigate(userData?.email === "admin@gmail.com" ? "/admin" : "/");
+      console.log("User data:", user);
+  
+      // Redirect based on email and password
+      if (userData?.email === "admin@gmail.com" && formData.password === "Admin@123") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     } finally {

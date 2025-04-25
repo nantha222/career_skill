@@ -1,186 +1,140 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import axios from "axios";
 
 const AdminSkillMapPage = () => {
-  const [skillMaps, setSkillMaps] = useState([]);
-  const [formData, setFormData] = useState({
-    skillName: "",
-    learningPath: [{ topic: "", subtopics: [{ name: "", resources: [] }], order: 1 }],
-    courseLinks: [""],
-    youtubeLinks: [""],
-  });
-  const [editingId, setEditingId] = useState(null);
+  const [skillName, setSkillName] = useState("");
+  const [topics, setTopics] = useState([{ topic: "", subtopics: [{ name: "", resources: [""] }] }]);
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    fetchSkillMaps();
-  }, []);
+  const handleAddTopic = () => {
+    setTopics([...topics, { topic: "", subtopics: [{ name: "", resources: [""] }] }]);
+  };
 
-  const fetchSkillMaps = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/skill-maps");
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await res.json();
-      setSkillMaps(data);
-    } catch (error) {
-      console.error("Error fetching skill maps", error);
+  const handleAddSubtopic = (topicIndex) => {
+    const updatedTopics = [...topics];
+    updatedTopics[topicIndex].subtopics.push({ name: "", resources: [""] });
+    setTopics(updatedTopics);
+  };
+
+  const handleAddResource = (topicIndex, subIndex) => {
+    const updatedTopics = [...topics];
+    updatedTopics[topicIndex].subtopics[subIndex].resources.push("");
+    setTopics(updatedTopics);
+  };
+
+  const handleChange = (topicIndex, subIndex, field, value, resourceIndex = null) => {
+    const updatedTopics = [...topics];
+    if (field === "topic") {
+      updatedTopics[topicIndex].topic = value;
+    } else if (field === "subtopic") {
+      updatedTopics[topicIndex].subtopics[subIndex].name = value;
+    } else if (field === "resource") {
+      updatedTopics[topicIndex].subtopics[subIndex].resources[resourceIndex] = value;
     }
-  };
-
-  const handleInputChange = (e, field, index = null, subIndex = null) => {
-    const { name, value } = e.target;
-    let updatedField = [...formData[field]];
-
-    if (subIndex !== null) {
-      updatedField[index].subtopics[subIndex].name = value;
-    } else if (index !== null) {
-      updatedField[index][name] = value;
-    } else {
-      setFormData({ ...formData, [name]: value });
-      return;
-    }
-    setFormData({ ...formData, [field]: updatedField });
-  };
-
-  const addTopic = () => {
-    setFormData({
-      ...formData,
-      learningPath: [...formData.learningPath, { topic: "", subtopics: [{ name: "", resources: [] }], order: formData.learningPath.length + 1 }]
-    });
-  };
-
-  const removeTopic = (index) => {
-    let updatedPath = [...formData.learningPath];
-    updatedPath.splice(index, 1);
-    setFormData({ ...formData, learningPath: updatedPath });
-  };
-
-  const addSubtopic = (index) => {
-    let updatedPath = [...formData.learningPath];
-    updatedPath[index].subtopics.push({ name: "", resources: [] });
-    setFormData({ ...formData, learningPath: updatedPath });
-  };
-
-  const removeSubtopic = (index, subIndex) => {
-    let updatedPath = [...formData.learningPath];
-    updatedPath[index].subtopics.splice(subIndex, 1);
-    setFormData({ ...formData, learningPath: updatedPath });
-  };
-
-  const addResource = (index, subIndex) => {
-    let updatedPath = [...formData.learningPath];
-    updatedPath[index].subtopics[subIndex].resources.push("");
-    setFormData({ ...formData, learningPath: updatedPath });
-  };
-
-  const handleResourceChange = (e, index, subIndex, resIndex) => {
-    let updatedPath = [...formData.learningPath];
-    updatedPath[index].subtopics[subIndex].resources[resIndex] = e.target.value;
-    setFormData({ ...formData, learningPath: updatedPath });
+    setTopics(updatedTopics);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {
+      skillName,
+      learningPath: topics.map((t, index) => ({
+        topic: t.topic,
+        order: index + 1,
+        subtopics: t.subtopics
+      })),
+    };
+
     try {
-      const url = editingId
-        ? `http://localhost:5000/api/skill-maps/${editingId}`
-        : "http://localhost:5000/api/skill-maps";
-      const method = editingId ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      fetchSkillMaps();
-      setFormData({ skillName: "", learningPath: [{ topic: "", subtopics: [{ name: "", resources: [] }], order: 1 }], courseLinks: [""], youtubeLinks: [""] });
-      setEditingId(null);
-    } catch (error) {
-      console.error("Error saving skill map", error);
+      await axios.post("http://localhost:5000/api/skill-maps", payload);
+      setMessage("Skill Map created successfully!");
+      setSkillName("");
+      setTopics([{ topic: "", subtopics: [{ name: "", resources: [""] }] }]);
+    } catch (err) {
+      console.error(err);
+      setMessage("Failed to create skill map");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-4">Admin - Skill Map Management</h1>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-lg font-semibold mb-2">{editingId ? "Edit Skill Map" : "Create New Skill Map"}</h2>
-
-        {/* Skill Name */}
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Create Skill Map</h2>
+      {message && <p className="text-green-600 mb-2">{message}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          name="skillName"
-          value={formData.skillName}
-          onChange={(e) => handleInputChange(e, "skillName")}
           placeholder="Skill Name"
+          className="w-full p-2 border rounded"
+          value={skillName}
+          onChange={(e) => setSkillName(e.target.value)}
           required
-          className="w-full p-2 border rounded-md mb-3"
         />
 
-        {/* Learning Path */}
-        {formData.learningPath.map((step, index) => (
-          <div key={index} className="mb-4 p-4 border rounded-md bg-gray-50">
-            <h3 className="text-md font-semibold">Topic {index + 1}</h3>
+        {topics.map((topic, topicIndex) => (
+          <div key={topicIndex} className="p-4 border rounded mb-2 bg-gray-50">
             <input
               type="text"
-              name="topic"
-              value={step.topic}
-              onChange={(e) => handleInputChange(e, "learningPath", index)}
-              placeholder="Topic Name"
-              className="w-full p-2 border rounded-md mb-2"
+              placeholder="Topic Title"
+              className="w-full mb-2 p-2 border rounded"
+              value={topic.topic}
+              onChange={(e) => handleChange(topicIndex, null, "topic", e.target.value)}
+              required
             />
 
-            {/* Subtopics */}
-            {step.subtopics.map((sub, subIndex) => (
-              <div key={subIndex} className="ml-4 p-3 border rounded-md bg-white">
+            {topic.subtopics.map((sub, subIndex) => (
+              <div key={subIndex} className="ml-4 mb-2">
                 <input
                   type="text"
                   placeholder="Subtopic Name"
+                  className="w-full p-2 border rounded mb-1"
                   value={sub.name}
-                  onChange={(e) => handleInputChange(e, "learningPath", index, subIndex)}
-                  className="w-full p-2 border rounded-md"
+                  onChange={(e) => handleChange(topicIndex, subIndex, "subtopic", e.target.value)}
+                  required
                 />
-                {/* Resources */}
                 {sub.resources.map((res, resIndex) => (
                   <input
                     key={resIndex}
-                    type="url"
-                    placeholder="Resource URL"
+                    type="text"
+                    placeholder="Resource Link"
+                    className="w-full p-2 border rounded mb-1"
                     value={res}
-                    onChange={(e) => handleResourceChange(e, index, subIndex, resIndex)}
-                    className="w-full p-2 border rounded-md mt-2"
+                    onChange={(e) => handleChange(topicIndex, subIndex, "resource", e.target.value, resIndex)}
+                    required
                   />
                 ))}
-                <button type="button" onClick={() => addResource(index, subIndex)} className="text-blue-500 mt-2">
+                <button
+                  type="button"
+                  className="text-blue-500 text-sm"
+                  onClick={() => handleAddResource(topicIndex, subIndex)}
+                >
                   + Add Resource
-                </button>
-                <button type="button" onClick={() => removeSubtopic(index, subIndex)} className="text-red-500 mt-2 ml-2">
-                  ❌ Remove Subtopic
                 </button>
               </div>
             ))}
-            <button type="button" onClick={() => addSubtopic(index)} className="text-blue-500 mt-2">
+
+            <button
+              type="button"
+              className="text-green-600 mt-1 text-sm"
+              onClick={() => handleAddSubtopic(topicIndex)}
+            >
               + Add Subtopic
-            </button>
-            <button type="button" onClick={() => removeTopic(index)} className="text-red-500 mt-2 ml-2">
-              ❌ Remove Topic
             </button>
           </div>
         ))}
-        <button type="button" onClick={addTopic} className="bg-blue-500 text-white p-2 rounded-md mb-3">
+
+        <button
+          type="button"
+          className="bg-yellow-500 text-white px-4 py-2 rounded"
+          onClick={handleAddTopic}
+        >
           + Add Topic
         </button>
-        <button type="submit" className="w-full bg-green-500 text-white p-2 rounded-md">
-          {editingId ? "Update Skill Map" : "Create Skill Map"}
+
+        <button
+          type="submit"
+          className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded"
+        >
+          Create Skill Map
         </button>
       </form>
     </div>

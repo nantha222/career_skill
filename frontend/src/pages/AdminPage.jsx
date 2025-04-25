@@ -1,5 +1,6 @@
 import { useState } from "react";
-import AdminSkillMapPage from "./AdminSkillMapPage"; // Import Skill Map Page
+import AdminSkillMapPage from "./AdminSkillMapPage";
+import AdminSkillMapListPage from "./AdminSkillMapListPage";
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState("AdminSkillMap");
@@ -8,6 +9,8 @@ const AdminDashboard = () => {
     switch (activePage) {
       case "AdminSkillMap":
         return <AdminSkillMapPage />;
+      case "AdminSkillMapList":
+        return <AdminSkillMapListPage />;
       default:
         return <div className="p-6">Select a section from the sidebar.</div>;
     }
@@ -25,7 +28,15 @@ const AdminDashboard = () => {
             }`}
             onClick={() => setActivePage("AdminSkillMap")}
           >
-            📚 Skill Maps
+            ➕ Create Skill Map
+          </li>
+          <li
+            className={`p-2 rounded-md cursor-pointer ${
+              activePage === "AdminSkillMapList" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+            }`}
+            onClick={() => setActivePage("AdminSkillMapList")}
+          >
+            📄 View Skill Maps
           </li>
         </ul>
       </aside>
