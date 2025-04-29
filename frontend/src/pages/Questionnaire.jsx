@@ -5,7 +5,6 @@ import axios from "axios";
 const QuestionnairePage = ({ onComplete }) => {
     const navigate = useNavigate();
     const [darkMode, setDarkMode] = useState(false);
-    const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         Age: "",
         Education: "",
@@ -20,7 +19,6 @@ const QuestionnairePage = ({ onComplete }) => {
     const [prediction, setPrediction] = useState("");
     const [isFinalized, setIsFinalized] = useState(false);
     const [errors, setErrors] = useState({});
-
 
     const validateForm = () => {
         let newErrors = {};
@@ -47,9 +45,8 @@ const QuestionnairePage = ({ onComplete }) => {
         if (!validateForm()) return;
 
         const user = JSON.parse(localStorage.getItem("user"));
-        console.log(user)
-        const userId = user ? user.userId    : null; // Get the user ID from local storage
-     
+        const userId = user ? user.userId : null; // Get the user ID from local storage
+
         try {
             const response = await axios.post("http://127.0.0.1:5000/predict", formData);
 
@@ -82,134 +79,121 @@ const QuestionnairePage = ({ onComplete }) => {
                 {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
             </button>
 
-            {step === 1 ? (
-                <div className={`${darkMode ? "bg-gray-800" : "bg-white"} p-6 rounded-lg shadow-lg w-full max-w-md text-center`}>
-                    <h2 className="text-xl font-semibold mb-4">Do you know what to study?</h2>
-                    <div className="flex justify-center gap-4">
-                        <button onClick={() => navigate("/dashboard")} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
-                            Yes, take me to the dashboard
-                        </button>
-                        <button onClick={() => setStep(2)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-                            No, help me decide
-                        </button>
+            <div className={`${darkMode ? "bg-gray-800" : "bg-white"} p-6 rounded-lg shadow-lg w-full max-w-md`}>
+                <h2 className="text-xl font-semibold text-center mb-4">Skill Prediction</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Age */}
+                    <div>
+                        <label className="block text-sm font-medium">Age</label>
+                        <input type="number" name="Age" value={formData.Age} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white" />
+                        {errors.Age && <span className="text-red-500 text-sm">{errors.Age}</span>}
                     </div>
-                </div>
-            ) : (
-                <div className={`${darkMode ? "bg-gray-800" : "bg-white"} p-6 rounded-lg shadow-lg w-full max-w-md`}>
-                    <h2 className="text-xl font-semibold text-center mb-4">Skill Prediction</h2>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Age */}
-                        <div>
-                            <label className="block text-sm font-medium">Age</label>
-                            <input type="number" name="Age" value={formData.Age} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white" />
-                            {errors.Age && <span className="text-red-500 text-sm">{errors.Age}</span>}
+
+                    {/* Education Level */}
+                    <div>
+                        <label className="block text-sm font-medium">Education Level</label>
+                        <select name="Education" value={formData.Education} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                            <option value="">Select</option>
+                            <option value="High School">High School</option>
+                            <option value="Bachelor's">Bachelor's</option>
+                            {formData.Age >= 22 && <option value="Master's">Master's</option>}
+                            {formData.Age >= 25 && <option value="PhD">PhD</option>}
+                        </select>
+                        {errors.Education && <span className="text-red-500 text-sm">{errors.Education}</span>}
+                    </div>
+
+                    {/* Occupation */}
+                    <div>
+                        <label className="block text-sm font-medium">Occupation</label>
+                        <select name="Occupation" value={formData.Occupation} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                            <option value="">Select</option>
+                            <option value="Student">Student</option>
+                            <option value="Job Seeker">Job Seeker</option>
+                            <option value="Working Professional">Working Professional</option>
+                        </select>
+                        {errors.Occupation && <span className="text-red-500 text-sm">{errors.Occupation}</span>}
+                    </div>
+
+                    {/* Field of Interest */}
+                    <div>
+                        <label className="block text-sm font-medium">Field of Interest</label>
+                        <select name="Interest" value={formData.Interest} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                            <option value="">Select</option>
+                            <option value="AI/ML">AI/ML</option>
+                            <option value="Blockchain">Blockchain</option>
+                            <option value="Cloud Computing">Cloud Computing</option>
+                            <option value="Full Stack Development">Full Stack Development</option>
+                            <option value="Networking">Networking</option>
+                        </select>
+                        {errors.Interest && <span className="text-red-500 text-sm">{errors.Interest}</span>}
+                    </div>
+
+                    {/* Experience Level */}
+                    <div>
+                        <label className="block text-sm font-medium">Experience Level</label>
+                        <select name="Experience" value={formData.Experience} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                            <option value="">Select</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                        {errors.Experience && <span className="text-red-500 text-sm">{errors.Experience}</span>}
+                    </div>
+
+                    {/* Learning Style */}
+                    <div>
+                        <label className="block text-sm font-medium">Learning Style</label>
+                        <select name="LearningStyle" value={formData.LearningStyle} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                            <option value="">Select</option>
+                            <option value="Visual">Visual</option>
+                            <option value="Auditory">Auditory</option>
+                            <option value="Reading/Writing">Reading/Writing</option>
+                            <option value="Kinesthetic">Kinesthetic</option>
+                        </select>
+                        {errors.LearningStyle && <span className="text-red-500 text-sm">{errors.LearningStyle}</span>}
+                    </div>
+
+                    {/* Time Commitment */}
+                    <div>
+                        <label className="block text-sm font-medium">Time Commitment</label>
+                        <select name="TimeCommitment" value={formData.TimeCommitment} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                            <option value="">Select</option>
+                            <option value="<5 hrs/week">Less than 5 hours</option>
+                            <option value="5-10 hrs/week">5-10 hours</option>
+                            <option value=">10 hrs/week">More than 10 hours</option>
+                        </select>
+                        {errors.TimeCommitment && <span className="text-red-500 text-sm">{errors.TimeCommitment}</span>}
+                    </div>
+
+                    {/* Preferred Resources */}
+                    <div>
+                        <label className="block text-sm font-medium">Preferred Resources</label>
+                        <select name="PreferredResources" value={formData.PreferredResources} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                            <option value="">Select</option>
+                            <option value="Free">Free</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Free & Paid">Free & Paid</option>
+                        </select>
+                        {errors.PreferredResources && <span className="text-red-500 text-sm">{errors.PreferredResources}</span>}
+                    </div>
+
+                    {prediction && (
+                        <div className="bg-green-200 text-green-800 p-4 mt-4 rounded-md">
+                            <strong>Predicted Skill:</strong> {prediction}
                         </div>
+                    )}
 
-                        {/* Education Level */}
-                        <div>
-                            <label className="block text-sm font-medium">Education Level</label>
-                            <select name="Education" value={formData.Education} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                <option value="">Select</option>
-                                <option value="High School">High School</option>
-                                <option value="Bachelor's">Bachelor's</option>
-                                {formData.Age >= 22 && <option value="Master's">Master's</option>}
-                                {formData.Age >= 25 && <option value="PhD">PhD</option>}
-                            </select>
-                            {errors.Education && <span className="text-red-500 text-sm">{errors.Education}</span>}
-                        </div>
-
-                        {/* Occupation */}
-                        <div>
-                            <label className="block text-sm font-medium">Occupation</label>
-                            <select name="Occupation" value={formData.Occupation} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                <option value="">Select</option>
-                                <option value="Student">Student</option>
-                                <option value="Job Seeker">Job Seeker</option>
-                                <option value="Working Professional">Working Professional</option>
-                            </select>
-                            {errors.Occupation && <span className="text-red-500 text-sm">{errors.Occupation}</span>}
-                        </div>
-
-                        {/* Field of Interest */}
-                        <div>
-                            <label className="block text-sm font-medium">Field of Interest</label>
-                            <select name="Interest" value={formData.Interest} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                <option value="">Select</option>
-                                <option value="AI/ML">AI/ML</option>
-                                <option value="Blockchain">Blockchain</option>
-                                <option value="Cloud Computing">Cloud Computing</option>
-                                <option value="Full Stack Development">Full Stack Development</option>
-                                <option value="Networking">Networking</option>
-                            </select>
-                            {errors.Interest && <span className="text-red-500 text-sm">{errors.Interest}</span>}
-                        </div>
-
-                        {/* Experience Level */}
-                        <div>
-                            <label className="block text-sm font-medium">Experience Level</label>
-                            <select name="Experience" value={formData.Experience} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                <option value="">Select</option>
-                                <option value="Beginner">Beginner</option>
-                                <option value="Intermediate">Intermediate</option>
-                                <option value="Advanced">Advanced</option>
-                            </select>
-                            {errors.Experience && <span className="text-red-500 text-sm">{errors.Experience}</span>}
-                        </div>
-
-                        {/* Learning Style */}
-                        <div>
-                            <label className="block text-sm font-medium">Learning Style</label>
-                            <select name="LearningStyle" value={formData.LearningStyle} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                <option value="">Select</option>
-                                <option value="Visual">Visual</option>
-                                <option value="Auditory">Auditory</option>
-                                <option value="Reading/Writing">Reading/Writing</option>
-                                <option value="Kinesthetic">Kinesthetic</option>
-                            </select>
-                            {errors.LearningStyle && <span className="text-red-500 text-sm">{errors.LearningStyle}</span>}
-                        </div>
-
-                        {/* Time Commitment */}
-                        <div>
-                            <label className="block text-sm font-medium">Time Commitment</label>
-                            <select name="TimeCommitment" value={formData.TimeCommitment} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                <option value="">Select</option>
-                                <option value="<5 hrs/week">Less than 5 hours</option>
-                                <option value="5-10 hrs/week">5-10 hours</option>
-                                <option value=">10 hrs/week">More than 10 hours</option>
-                            </select>
-                        </div>
-
-                        {/* Preferred Resources */}
-                        <div>
-                            <label className="block text-sm font-medium">Preferred Resources</label>
-                            <select name="PreferredResources" value={formData.PreferredResources} onChange={handleChange} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                <option value="">Select</option>
-                                <option value="Free">Free</option>
-                                <option value="Paid">Paid</option>
-                                <option value="Free & Paid">Free & Paid</option>
-                            </select>
-                            {errors.PreferredResources && <span className="text-red-500 text-sm">{errors.PreferredResources}</span>}
-                        </div>
-
-                        {prediction && (
-                            <div className="bg-green-200 text-green-800 p-4 mt-4 rounded-md">
-                                <strong>Predicted Skill:</strong> {prediction}
-                            </div>
-                        )}
-
-                        {prediction && !isFinalized ? (
-                            <button onClick={handleFinalize} className="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 mt-4">
-                                Finalize
-                            </button>
-                        ) : (
-                            <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-                                Predict Skill
-                            </button>
-                        )}
-                    </form>
-                </div>
-            )}
+                    {prediction && !isFinalized ? (
+                        <button onClick={handleFinalize} className="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 mt-4">
+                            Finalize
+                        </button>
+                    ) : (
+                        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                            Predict Skill
+                        </button>
+                    )}
+                </form>
+            </div>
         </div>
     );
 };
