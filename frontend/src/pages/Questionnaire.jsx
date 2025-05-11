@@ -88,39 +88,9 @@ const QuestionnairePage = ({ onComplete }) => {
         }
     };
 
-    const handleFinalize = async () => {
-        setIsSubmitting(true);
-        try {
-            const allSkillsResponse = await axios.get("http://localhost:5000/api/skill-maps");
-            const allSkills = allSkillsResponse.data;
-            const predictedSkillName = prediction.trim().toLowerCase();
-      
-            let matchedSkill = allSkills.find(skill =>
-                skill.skillName.trim().toLowerCase() === predictedSkillName
-            );
-      
-            if (!matchedSkill) {
-                matchedSkill = allSkills.find(skill =>
-                    predictedSkillName.includes(skill.skillName.trim().toLowerCase()) ||
-                    skill.skillName.trim().toLowerCase().includes(predictedSkillName)
-                );
-            }
-      
-            if (matchedSkill) {
-                localStorage.setItem("predictedSkillFull", JSON.stringify(matchedSkill));
-            } else {
-                console.warn("Predicted skill not matched:", predictedSkillName);
-            }
-      
-            setIsFinalized(true);
-            navigate("/dashboard");
-        } catch (error) {
-            console.error("Finalization error:", error);
-            navigate("/dashboard");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+const handleFinalize = async () => {
+        navigate("/dashboard");
+};
 
     return (
         <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
